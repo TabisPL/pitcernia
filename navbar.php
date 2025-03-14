@@ -2,9 +2,9 @@
 session_start(); // Start sesji
 // Dane do połączenia z bazą danych
 $serwer = 'localhost';
-$baza_danych = 'pizza3test';
-$uzytkownik = 'root';
-$haslo = '';
+$baza_danych = 'srv82461_pizza3test';
+$uzytkownik = 'srv82461_pizza3test';
+$haslo = '12345678';
 // Połączenie z bazą danych
 $baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
 
