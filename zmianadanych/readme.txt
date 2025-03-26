@@ -1,0 +1,1 @@
+ogólnie to ten no dziala ale tylko dane adresowe i imie nazwisko bo nie umiem narazie zrobic tego maila, tylko troche naszpąciłem i to jest tez podpięte do login.css który juz jest na githubie
