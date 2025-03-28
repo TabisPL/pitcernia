@@ -21,9 +21,9 @@ function get_orders($baza, $logged_user) {
   $total_amount = 0;
   $cur_order = -1;
 
-  $sql = "SELECT zamowienia.KwotaCalkowita, zamowienia.Status, zamowienia.DataUtworzenia, zamowienia.DataAktualizacji, szczegolyzamowienia.Ilosc, pizze.Nazwa, pizze.Rozmiar, zamowienia.ZamowienieID FROM `zamowienia`
-  JOIN szczegolyzamowienia ON szczegolyzamowienia.ZamowienieID = zamowienia.ZamowienieID JOIN pizze ON pizze.PizzaID = szczegolyzamowienia.PizzaID
-  WHERE zamowienia.UzytkownikID = '$logged_user' ORDER BY zamowienia.Status;";
+  $sql = "SELECT Zamowienia.KwotaCalkowita, Zamowienia.Status, Zamowienia.DataUtworzenia, Zamowienia.DataAktualizacji, SzczegolyZamowienia.Ilosc, Pizze.Nazwa, Pizze.Rozmiar, Zamowienia.ZamowienieID FROM `Zamowienia`
+  JOIN SzczegolyZamowienia ON SzczegolyZamowienia.ZamowienieID = Zamowienia.ZamowienieID JOIN Pizze ON Pizze.PizzaID = SzczegolyZamowienia.PizzaID
+  WHERE Zamowienia.UzytkownikID = '$logged_user' ORDER BY Zamowienia.Status;";
   $orders = mysqli_query($baza, $sql);
 
   // Tworzenie tabeli dla każdego zamówienia osobno
@@ -42,7 +42,7 @@ function get_orders($baza, $logged_user) {
       }
       $cur_order = $order["ZamowienieID"];
       //Tworzenie nowej tabeli
-      echo "<div class='bg-light justify-content-center rounded p-1'><table class='table'>";
+      echo "<div class='border rounded bg-secondary'><table class='table-secondary text-white table-bordered'>";
       echo "<tr><td>Data utworzenia:</td><td>".$order["DataUtworzenia"]."</td><td>Ostatnia aktualizacja:</td><td>".$order["DataAktualizacji"]."</td></tr>";
     }
     echo "<tr><td>Pizza:</td><td>".$order["Nazwa"]."</td></tr>";
@@ -65,7 +65,7 @@ function get_orders($baza, $logged_user) {
 
 // Funkcja sprawdza czy zamówienie nie jest w trakcie realizacji
 function get_status($baza, $order_id) {
-  $sql = "SELECT Status FROM zamowienia WHERE ZamowienieID = '$order_id';";
+  $sql = "SELECT Status FROM Zamowienia WHERE ZamowienieID = '$order_id';";
   $status = mysqli_query($baza, $sql);
   if ($status == "W trakcie realizacji" or $status == "Zakonczone") {
     return true;
@@ -80,7 +80,7 @@ if (isset($_POST['cancelOrder'])) {
     echo "<script>alert('Nie możesz anulować zamówienia, ponieważ jest w trakcie realizacji!');</script>";
   }
   else {
-    $sqlU = "UPDATE `zamowienia` SET `Status` = 'Anulowane' WHERE `zamowienia`.`ZamowienieID` = ".$cur_order.";";
+    $sqlU = "UPDATE `Zamowienia` SET `Status` = 'Anulowane' WHERE `Zamowienia`.`ZamowienieID` = ".$cur_order.";";
     mysqli_query($baza, $sqlU);
     header("Location: userPanel.php");
   }
@@ -89,7 +89,7 @@ if (isset($_POST['cancelOrder'])) {
 // Funkcja sprawdza czy zamówienie nie jest aktywne
 function check_status($baza, $logged_user) {
   $is_active = false;
-  $sql = "SELECT Status FROM zamowienia WHERE UzytkownikID = '$logged_user';";
+  $sql = "SELECT Status FROM Zamowienia WHERE UzytkownikID = '$logged_user';";
   $orders = mysqli_query($baza, $sql);
   foreach ($orders as $status) {
     if ($status["Status"] == "Oczekujace" or $status["Status"] == "WRealizacji") {
@@ -169,8 +169,8 @@ if (isset($_POST['deleteAccount'])) {
 </div>
 </br>
 <!-- Wyświetlanie zamówień -->
-<div class="row">
-  <div class="col-lg-8">
+<div class="row mx-1">
+  <div class="col-lg-auto">
     <?php 
     if ($czyzalogowany) {
       $total_amount = get_orders($baza, $logged_user);
@@ -180,22 +180,27 @@ if (isset($_POST['deleteAccount'])) {
       echo  "Użytkownik nie zalogowany!";
     }?>
   </div>
-  <div class="col-lg-4 align-items-right">
+  <div class="col-lg-4">
     <!-- Wylogowanie -->
-    <div class="bg-light p-2 text-dark text-center rounded">
+    <div class="p-4 border rounded bg-secondary text-center">
       <h4>Kliknij poniżej aby się wylogować:</h4>
       <a href="logout.php" class="btn btn-warning">Wyloguj się</a>
     </div>
     </br>
+    <div class="p-4 border rounded bg-secondary text-center">
+      <h4>Kliknij poniżej aby zmienić dane:</h4>
+      <a href="ZmianaDanych.php" class="btn btn-warning">Zmień dane</a>
+    </div>
+    </br>
     <!-- Wyświetlanie łącznej kwoty zamówień -->
-    <div class="bg-light text-dark text-center p-3 rounded">
+    <div class="p-4 border rounded bg-secondary text-center">
       <h3>Łączna kwota zamówień: </h3>
       <?php
         echo "<h2>$total_amount zł</h2>";
       ?>
     </div>
     </br>
-    <div class="bg-light text-dark text-center p-3 rounded">
+    <div class="p-4 border rounded bg-secondary text-center">
       <h4>Usuń konto:</h4>
       <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target='#deleteAccountModal'>Usuń</button>
       <p>Uwaga! Konta nie można usunąć jeżeli są aktywne zamówienia.</p>
