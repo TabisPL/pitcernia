@@ -1,54 +1,35 @@
+<?php
+// Dane do połączenia z bazą danych
+$serwer = 'localhost';
+$baza_danych = 'c3test';
+$uzytkownik = 'root';
+$haslo = '';
+
+// Połączenie z bazą danych
+$baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
+?>
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>test</title>
-  <link rel="stylesheet" href="tu.css" />
- 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+  
+  <link rel="stylesheet" href="navbar.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
-<body>
+<body class="bg-dark text-white">
+<?php include 'navbar.php'; ?>
+<main>
   <div class="container">
-    <nav>
-      <ul>
-        <a href="#" class="logo">
-          <img src="placeholder.jpg" alt="">
-          <span class="nav-item">DashBoard</span>
-        </a>
-        <a href="#">
-          <i class="fas fa-home"></i>
-          <span class="nav-item">Home</span>
-        </a>
-        <a href="">
-          <i class="fas fa-user"></i>
-          <span class="nav-item">Profile</span>
-        </a>
-        <a href="">
-          <i class="fas fa-wallet"></i>
-          <span class="nav-item">Wallet</span>
-        </a>
-        
-        <a href="">
-          <i class="fas fa-tasks"></i>
-          <span class="nav-item">Tasks</span>
-        </a>
-        <a href="">
-          <i class="fas fa-cog"></i>
-          <span class="nav-item">Settings</span>
-        </a>
-        <a href="">
-          <i class="fas fa-question-circle"></i>
-          <span class="nav-item">Help</span>
-        </a>
-        <a href="" class="logout">
-          <i class="fas fa-sign-out-alt"></i>
-          <span class="nav-item">Log out</span>
-        </a>
-      </ul>
-    </nav>
     <section class="main">
       <div class="main-top">
-        <h1>Pizza</h1>
+        <h1>Admin Panel</h1>
         
       </div>
       <div class="main-skills">
@@ -60,19 +41,32 @@
         </div>
         <div class="card">
           
-          <h3>zrealizowane</h3>
+          <h3>szczegóły</h3>
           <p>pizza</p>
           <button>sprawdz</button>
         </div>
         <div class="card">
           
-          <h3>anulowane</h3>
+          <h3>historia</h3>
           <p>pizza</p>
           <button>sprawdz</button>
         </div>
         <div class="card">
           
-          <h3>pizze</h3>
+          <h3>zamówienia dzisiejsze</h3>
+          <h3>Łączna kwota zamówień: </h3>
+      <?php
+      $sql = "SELECT zamowienia.KwotaCalkowita, zamowienia.Status, zamowienia.DataUtworzenia, zamowienia.DataAktualizacji, szczegolyzamowienia.Ilosc, pizze.Nazwa, pizze.Rozmiar, zamowienia.ZamowienieID FROM `zamowienia`
+      JOIN szczegolyzamowienia ON szczegolyzamowienia.ZamowienieID = zamowienia.ZamowienieID JOIN pizze ON pizze.PizzaID = szczegolyzamowienia.PizzaID
+      WHERE zamowienia.UzytkownikID = '' ORDER BY zamowienia.Status;";
+      
+        echo "<h2>$total_amount</h2>"
+      
+      ?>
+        </div>
+        <div class="card">
+          
+          <h3>podsumówanie kwoty zamówień</h3>
           <p>pizza</p>
           <button>pizza</button>
         </div>
@@ -81,5 +75,6 @@
       </section>
     </section>
   </div>
+</main>
 </body>
 </html></span>
