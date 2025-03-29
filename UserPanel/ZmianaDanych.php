@@ -10,7 +10,6 @@ $baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
 
 
 
-//To ogólnie robi to ze jak nie zalogowany to nie wedjze na strone tylko na login page go da (mam nadzieje przynajmniej)
 if (!isset($_SESSION['UzytkownikID'])) {
     header("Location: ../login.php");
     exit();
@@ -28,44 +27,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $numer_mieszkania = !empty($_POST['numer_mieszkania']) ? $_POST['numer_mieszkania'] : 'NULL';
     $miasto = $_POST['miasto'];
     $kod_pocztowy = $_POST['kod_pocztowy'];
+    $nazwa_uzytkownika = $_POST['nazwa_uzytkownika'];
+    $email = $_POST['email'];
 
-    
-    $updateUzytkownik = "UPDATE Uzytkownicy SET Imie='$imie', Nazwisko='$nazwisko' WHERE UzytkownikID=$uzytkownik_id";
-    mysqli_query($baza, $updateUzytkownik);
+    $check_query = "SELECT UzytkownikID FROM Uzytkownicy WHERE (NazwaUzytkownika='$nazwa_uzytkownika' OR Email='$email') AND UzytkownikID != $uzytkownik_id";
+    $check_result = mysqli_query($baza, $check_query);
 
-   
-    $result = mysqli_query($baza, "SELECT AdresID FROM AdresyUzytkownikow WHERE UzytkownikID = $uzytkownik_id");
-
-    if (mysqli_num_rows($result) > 0) {
-      
-        $updateAdres = "UPDATE AdresyUzytkownikow 
-                        SET Ulica='$ulica', NumerDomu='$numer_domu', NumerMieszkania='$numer_mieszkania', Miasto='$miasto', KodPocztowy='$kod_pocztowy' 
-                        WHERE UzytkownikID=$uzytkownik_id";
-        mysqli_query($baza, $updateAdres);
+    if (mysqli_num_rows($check_result) > 0) {
+        $_SESSION['komunikat'] = "<div class='alert alert-danger text-center'>Nazwa użytkownika lub email są już zajęte!</div>";
     } else {
-        
-        $insertAdres = "INSERT INTO AdresyUzytkownikow (UzytkownikID, Ulica, NumerDomu, NumerMieszkania, Miasto, KodPocztowy) 
-                        VALUES ($uzytkownik_id, '$ulica', '$numer_domu', '$numer_mieszkania', '$miasto', '$kod_pocztowy')";
-        mysqli_query($baza, $insertAdres);
+        $updateUzytkownik = "UPDATE Uzytkownicy 
+                            SET NazwaUzytkownika='$nazwa_uzytkownika', Email='$email', Imie='$imie', Nazwisko='$nazwisko' 
+                            WHERE UzytkownikID=$uzytkownik_id";
+        mysqli_query($baza, $updateUzytkownik);
+
+        $result = mysqli_query($baza, "SELECT AdresID FROM AdresyUzytkownikow WHERE UzytkownikID = $uzytkownik_id");
+
+        if (mysqli_num_rows($result) > 0) {
+            $updateAdres = "UPDATE AdresyUzytkownikow 
+                            SET Ulica='$ulica', NumerDomu='$numer_domu', NumerMieszkania='$numer_mieszkania', Miasto='$miasto', KodPocztowy='$kod_pocztowy' 
+                            WHERE UzytkownikID=$uzytkownik_id";
+            mysqli_query($baza, $updateAdres);
+        } else {
+            $insertAdres = "INSERT INTO AdresyUzytkownikow (UzytkownikID, Ulica, NumerDomu, NumerMieszkania, Miasto, KodPocztowy) 
+                            VALUES ($uzytkownik_id, '$ulica', '$numer_domu', '$numer_mieszkania', '$miasto', '$kod_pocztowy')";
+            mysqli_query($baza, $insertAdres);
+        }
+
+        $_SESSION['komunikat'] = "<div class='alert alert-success text-center'>Dane zaktualizowane pomyślnie!</div>";
     }
 
-    
-    $_SESSION['komunikat'] = "<div class='alert alert-success text-center'>Dane zaktualizowane pomyślnie!</div>";
-
-    
-    header("Location: ".$_SERVER['PHP_SELF']);
+    header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
 
-$sql = "SELECT Uzytkownicy.Imie, Uzytkownicy.Nazwisko, AdresyUzytkownikow.Ulica, 
-               AdresyUzytkownikow.NumerDomu, AdresyUzytkownikow.NumerMieszkania, 
+$sql = "SELECT Uzytkownicy.NazwaUzytkownika, Uzytkownicy.Email, Uzytkownicy.Imie, Uzytkownicy.Nazwisko, 
+               AdresyUzytkownikow.Ulica, AdresyUzytkownikow.NumerDomu, AdresyUzytkownikow.NumerMieszkania, 
                AdresyUzytkownikow.Miasto, AdresyUzytkownikow.KodPocztowy 
         FROM Uzytkownicy 
         LEFT JOIN AdresyUzytkownikow ON Uzytkownicy.UzytkownikID = AdresyUzytkownikow.UzytkownikID 
         WHERE Uzytkownicy.UzytkownikID = $uzytkownik_id";
 $result = mysqli_query($baza, $sql);
 $dane = mysqli_fetch_assoc($result) ?? [];
-
 
 if (isset($_SESSION['komunikat'])) {
     $komunikat = $_SESSION['komunikat'];
@@ -85,7 +88,7 @@ mysqli_close($baza);
     <link rel="stylesheet" href="login.css">
 </head>
 <body class="bg-dark text-light">
-<?php include '../navbar/navbar.php'; ?>  
+<?php include '../navbar.php'; ?>  
 
 <div class="container mt-5">
     <h2 class="text-center">Edytuj swoje dane</h2>
@@ -93,6 +96,17 @@ mysqli_close($baza);
     <?= $komunikat ?>
 
     <form method="POST" class="p-4 border rounded bg-secondary">
+    
+        <div class="mb-3">
+            <label for="nazwa_uzytkownika" class="form-label">Nazwa użytkownika:</label>
+            <input type="text" class="form-control" id="nazwa_uzytkownika" name="nazwa_uzytkownika" value="<?= htmlspecialchars($dane['NazwaUzytkownika'] ?? '') ?>" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($dane['Email'] ?? '') ?>" required>
+        </div>
+
         <div class="mb-3">
             <label for="imie" class="form-label">Imię:</label>
             <input type="text" class="form-control" id="imie" name="imie" value="<?= htmlspecialchars($dane['Imie'] ?? '') ?>" required>
