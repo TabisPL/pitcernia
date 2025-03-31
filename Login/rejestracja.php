@@ -11,9 +11,9 @@ https://www.w3schools.com/php/php_mysql_prepared_statements.asp
 $czyzalogowany = isset($_SESSION['UzytkownikID']);
 
 $serwer = 'localhost';
-$baza_danych = 'srv82461_pizza3test';
-$uzytkownik = 'srv82461_pizza3test';
-$haslo = '12345678';
+$baza_danych = 'pizza3test';
+$uzytkownik = 'root';
+$haslo = '';
 
 $conn = new mysqli($serwer, $uzytkownik, $haslo, $baza_danych);
 

@@ -14,6 +14,20 @@ $czyzalogowany = isset($_SESSION['UzytkownikID']);
 if ($czyzalogowany) {
   $logged_user = $_SESSION['UzytkownikID'];
 }
+if (!isset($_SESSION['UzytkownikID'])) {
+  header("Location: ../login/login.php");
+  exit();
+}
+else {
+  $sql = "SELECT czyAdmin FROM `uzytkownicy` WHERE UzytkownikID ='$logged_user';";
+  $admin = mysqli_query($baza, $sql);
+  foreach ($admin as $a) {
+    if ($a['czyAdmin']) {
+      header("Location: ../UserPanel/adminPanel.php");
+    }
+  }
+  
+}
 
 // Funkcja tworzy tabelę do wyświetlania zamówień i pobiera je z bazy danych
 function get_orders($baza, $logged_user) {

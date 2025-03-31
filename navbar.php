@@ -1,13 +1,4 @@
 <?php
-session_start(); // Start sesji
-// Dane do połączenia z bazą danych
-$serwer = 'localhost';
-$baza_danych = 'pizza3test';
-$uzytkownik = 'root';
-$haslo = '';
-// Połączenie z bazą danych
-$baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
-
 $czyzalogowany = isset($_SESSION['UzytkownikID']);
 if ($czyzalogowany) {
   $logged_user = $_SESSION['UzytkownikID'];
