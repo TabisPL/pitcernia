@@ -1,3 +1,8 @@
+### Dodawanie ikonki ###
+
+W sekcji <header> trzeba dopisać:
+<link rel="icon" type="image/x-icon" href="../img.png">
+
 ### Dodawanie Navbara ###
 
 Aby dołączyć navbara do strony należy dodać:
