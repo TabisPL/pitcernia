@@ -56,7 +56,7 @@ function get_orders($baza, $logged_user) {
       }
       $cur_order = $order["ZamowienieID"];
       //Tworzenie nowej tabeli
-      echo "<div class='border rounded bg-secondary'><table class='table-secondary text-white table-bordered'>";
+      echo "<div class='border shadow rounded bg-secondary'><table class='table-secondary text-white table-bordered'>";
       echo "<tr><td>Data utworzenia:</td><td>".$order["DataUtworzenia"]."</td><td>Ostatnia aktualizacja:</td><td>".$order["DataAktualizacji"]."</td></tr>";
     }
     echo "<tr><td>Pizza:</td><td>".$order["Nazwa"]."</td></tr>";
@@ -137,10 +137,11 @@ if (isset($_POST['deleteAccount'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pitcernia</title>
+  <link rel="icon" type="image/x-icon" href="../img.png">
   <link rel="stylesheet" href="../navbar.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
-<body class="bg-dark text-white">
+<body class="bg-dark bg-gradient text-white">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <?php include '../navbar.php'; ?>
 <main>
@@ -184,7 +185,8 @@ if (isset($_POST['deleteAccount'])) {
 </br>
 <!-- Wyświetlanie zamówień -->
 <div class="row mx-1">
-  <div class="col-lg-auto">
+  <div class="col-lg-auto me-auto text-center">
+    <h4>Historia zamówień:</h4>
     <?php 
     if ($czyzalogowany) {
       $total_amount = get_orders($baza, $logged_user);
@@ -194,27 +196,27 @@ if (isset($_POST['deleteAccount'])) {
       echo  "Użytkownik nie zalogowany!";
     }?>
   </div>
-  <div class="col-lg-4">
+  <div class="col-lg-4 ms-auto">
     <!-- Wylogowanie -->
-    <div class="p-4 border rounded bg-secondary text-center">
+    <div class="p-4 border rounded bg-secondary shadow text-center">
       <h4>Kliknij poniżej aby się wylogować:</h4>
       <a href="logout.php" class="btn btn-warning">Wyloguj się</a>
     </div>
     </br>
-    <div class="p-4 border rounded bg-secondary text-center">
+    <div class="p-4 border rounded bg-secondary shadow text-center">
       <h4>Kliknij poniżej aby zmienić dane:</h4>
       <a href="ZmianaDanych.php" class="btn btn-warning">Zmień dane</a>
     </div>
     </br>
     <!-- Wyświetlanie łącznej kwoty zamówień -->
-    <div class="p-4 border rounded bg-secondary text-center">
+    <div class="p-4 border rounded bg-secondary shadow text-center">
       <h3>Łączna kwota zamówień: </h3>
       <?php
         echo "<h2>$total_amount zł</h2>";
       ?>
     </div>
     </br>
-    <div class="p-4 border rounded bg-secondary text-center">
+    <div class="p-4 border rounded bg-secondary shadow text-center">
       <h4>Usuń konto:</h4>
       <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target='#deleteAccountModal'>Usuń</button>
       <p>Uwaga! Konta nie można usunąć jeżeli są aktywne zamówienia.</p>
