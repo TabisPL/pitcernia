@@ -96,11 +96,12 @@ mysqli_close($baza);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edycja danych</title>
+    <link rel="icon" type="image/x-icon" href="../img.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="login.css">
 </head>
-<body class="bg-dark text-light">
-<?php include '../navbar/navbar.php'; ?>  
+<body class="bg-dark bg-gradient text-white">
+<?php include '../navbar.php'; ?>  
 
 <div class="container mt-5">
     <h2 class="text-center">Edytuj swoje dane</h2>

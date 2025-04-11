@@ -56,7 +56,7 @@ function get_orders($baza, $logged_user) {
       }
       $cur_order = $order["ZamowienieID"];
       //Tworzenie nowej tabeli
-      echo "<div class='border shadow rounded bg-secondary'><table class='table-secondary text-white table-bordered'>";
+      echo "<div class='table-responsive border shadow rounded bg-secondary'><table class='table-secondary text-white table-bordered'>";
       echo "<tr><td>Data utworzenia:</td><td>".$order["DataUtworzenia"]."</td><td>Ostatnia aktualizacja:</td><td>".$order["DataAktualizacji"]."</td></tr>";
     }
     echo "<tr><td>Pizza:</td><td>".$order["Nazwa"]."</td></tr>";
