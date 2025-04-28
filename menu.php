@@ -1,18 +1,3 @@
-<?php
-session_start(); // Start sesji
-$czyzalogowany = isset($_SESSION['UzytkownikID']);
-
-//Dane do połączenia z bazą danych
-$serwer = 'localhost';
-$baza_danych = 'pizza3test';
-$uzytkownik = 'root';
-$haslo = '';
-
-//Połączenie z bazą danych
-$baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
-?>
-
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -105,9 +90,6 @@ $baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
 
         //SQL na składniki 
 
-        // SELECT * FROM `PizzaSkladniki` JOIN Pizze ON Pizze.PizzaID=PizzaSkladniki.PizzaID JOIN Skladniki ON Skladniki.SkladnikID=PizzaSkladniki.SkladnikID  WHERE Skladniki.Nazwa LIKE 'koń'
-        // SELECT * FROM Pizze JOIN PizzaSkladniki ON Pizze.PizzaID=PizzaSkladniki.PizzaID JOIN Skladniki ON Skladniki.SkladnikID=PizzaSkladniki.SkladnikID WHERE Cena BETWEEN '.$cena_min.' AND '.$cena_max.' AND rozmiar LIKE "'. $rozmiar.'"';
-        // $sql = 'SELECT * FROM Pizze WHERE Cena BETWEEN '.$cena_min.' AND '.$cena_max.' AND rozmiar LIKE "'. $rozmiar.'"';
         $sql = 'SELECT * FROM Pizze JOIN PizzaSkladniki ON Pizze.PizzaID=PizzaSkladniki.PizzaID JOIN Skladniki ON Skladniki.SkladnikID=PizzaSkladniki.SkladnikID 
         WHERE Cena BETWEEN '.$cena_min.' AND '.$cena_max.' AND rozmiar LIKE "'. $rozmiar.'" AND Skladniki.SkladnikID = "" ';
 
@@ -116,9 +98,7 @@ $baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
           $sql = $sql.' OR Skladniki.SkladnikID = '.$s_id;
         }
 
-
         $result = $baza->query($sql);
-
 
         $pizzaID = [];
       
@@ -134,8 +114,6 @@ $baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
           $r3 = rand(0,255);
           $g3 = rand(0,255);
           $b3 = rand(0,255);
-
-          // $pizzaID [] = $p["PizzaID"];
 
           $nazwa = $p["Nazwa"];
           $image = $p["ObrazekURL"];
@@ -173,47 +151,5 @@ $baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
         }
       ?>
     </div>
-    
-
-    <!-- <div class="row row-cols-1 row-cols-md-3 g-4">
-  <div class="col">
-    <div class="card h-100">
-      <img src="..." class="card-img-top" alt="...">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card h-100">
-      <img src="..." class="card-img-top" alt="...">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a short card.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card h-100">
-      <img src="..." class="card-img-top" alt="...">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card h-100">
-      <img src="..." class="card-img-top" alt="...">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      </div>
-    </div>
-  </div>
-</div> -->
-
-
 </body>
 </html>
