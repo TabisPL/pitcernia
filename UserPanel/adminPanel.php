@@ -7,12 +7,13 @@ $uzytkownik = 'root';
 $haslo = '';
 
 // Połączenie z bazą danych
-$baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
+$baza = new mysqli($serwer, $uzytkownik, $haslo, $baza_danych);
 
 // Sprawdzenie połączenia
 if ($baza->connect_error) {
   die("Błąd połączenia: " . $baza->connect_error);
 }
+
 // Sprawdzanie użytkownika
 $czyzalogowany = isset($_SESSION['UzytkownikID']);
 if ($czyzalogowany) {
@@ -22,12 +23,13 @@ if (isset($_SESSION['UzytkownikID'])) {
   $sql = "SELECT czyAdmin FROM `uzytkownicy` WHERE UzytkownikID ='$logged_user';";
   $admin = mysqli_query($baza, $sql);
   foreach ($admin as $a) {
-    if ($a['czyAdmin']) {
-      header("Location: ../UserPanel/adminPanel.php");
+    if (!$a['czyAdmin']) {
+      header("Location: ../UserPanel/userPanel.php");
     }
   }
 }
 else header("Location: ../login/login.php");
+
 ?>
 
 
@@ -54,40 +56,182 @@ else header("Location: ../login/login.php");
        ?>
       </div>
       <div class="">
-        
+        <div class="">
+          
+          
+          <?php 
+          // Obsługa zmiany statusu zamówienia
+            if (isset($_GET['wykonane'])) {
+               $id = (int)$_GET['wykonane'];
+                $baza->query("UPDATE Zamowienia SET Status='Zakonczone' WHERE ZamowienieID=$id");
+               header("Location: adminPanel.php");
+              exit;
+}
+
+              // Funkcja do pobierania zamówień
+              function pobierzZamowienia($conn, $status) {
+                $zamowienia = [];
+                $query = "SELECT Z.ZamowienieID, U.NazwaUzytkownika, 
+                   A.Ulica, A.NumerDomu, A.NumerMieszkania, A.Miasto, A.KodPocztowy, 
+                   Z.KwotaCalkowita, Z.Status, 
+                   P.PizzaID, SZ.Ilosc
+                    FROM Zamowienia Z
+                    JOIN Uzytkownicy U ON Z.UzytkownikID = U.UzytkownikID
+                    JOIN adresyuzytkownikow A ON U.UzytkownikID = A.UzytkownikID
+                    JOIN SzczegolyZamowienia SZ ON Z.ZamowienieID = SZ.ZamowienieID
+                    JOIN pizze P ON SZ.PizzaID = P.PizzaID
+                    WHERE Z.Status = '$status'
+                    ORDER BY Z.ZamowienieID DESC";
+
+                $result = $conn->query($query);
+
+           if ($result) {
+             while ($row = $result->fetch_assoc()) {
+              $id = $row['ZamowienieID'];
+
+          // Składanie adresu:
+          $adres = $row['Ulica'] . ' ' . $row['NumerDomu'];
+          if (!empty($row['NumerMieszkania'])) {
+              $adres .= '/' . $row['NumerMieszkania'];
+          }
+          $adres .= ', ' . $row['KodPocztowy'] . ' ' . $row['Miasto'];
+
+          if (!isset($zamowienia[$id])) {
+              $zamowienia[$id] = [
+                  'uzytkownik' => $row['NazwaUzytkownika'],
+                  'adres' => $adres,
+                  'kwota' => $row['KwotaCalkowita'],
+                  'status' => $row['Status'],
+                  'pizze' => []
+              ];
+          }
+          $zamowienia[$id]['pizze'][] = [
+              'nazwa' => $row['Nazwa'],
+              'ilosc' => $row['Ilosc']
+          ];
+      }
+  }
+
+  return $zamowienia;
+}
+
+
+
+// Pobranie zamówień aktywnych i zakończonych
+$aktywneZamowienia = pobierzZamowienia($baza, 'Oczekujace');
+$zakonczoneZamowienia = pobierzZamowienia($baza, 'Zakonczone');
+// Wyświetlanie aktywnych zamówień
+echo "<h2>Aktywne zamówienia</h2>";
+if (!empty($aktywneZamowienia)) {
+    foreach ($aktywneZamowienia as $id => $zamowienie) {
+        echo "<div style='border:1px solid #ccc; margin:10px; padding:10px;'>";
+        echo "<strong>Zamówienie #$id</strong><br>";
+        echo "Użytkownik: " . htmlspecialchars($zamowienie['uzytkownik']) . "<br>";
+        echo "Adres: " . htmlspecialchars($zamowienie['adres']) . "<br>";
+        echo "Kwota: " . number_format($zamowienie['kwota'], 2) . " PLN<br>";
+        echo "<ul>";
+        foreach ($zamowienie['pizze'] as $pizza) {
+            echo "<li>" . (int)$pizza['ilosc'] . "x " . htmlspecialchars($pizza['nazwa']) . "</li>";
+        }
+        echo "</ul>";
+        echo "<a href='adminPanel.php?wykonane=$id' style='color: green;'>Oznacz jako wykonane</a>";
+        echo "</div>";
+    }
+} else {
+    echo "<p>Brak aktywnych zamówień.</p>";
+}
+
+// Wyświetlanie historii zamówień
+echo "<h2>Historia zamówień</h2>";
+if (!empty($zakonczoneZamowienia)) {
+    foreach ($zakonczoneZamowienia as $id => $zamowienie) {
+        echo "<div style='border:1px solid #eee; margin:10px; padding:10px; color:black; background-color:#f9f9f9;'>";
+        echo "<strong>Zamówienie #$id</strong><br>";
+        echo "Użytkownik: " . htmlspecialchars($zamowienie['uzytkownik']) . "<br>";
+        echo "Adres: " . htmlspecialchars($zamowienie['adres']) . "<br>";
+        echo "Kwota: " . number_format($zamowienie['kwota'], 2) . " PLN<br>";
+        echo "<ul>";
+        foreach ($zamowienie['pizze'] as $pizza) {
+            echo "<li>" . (int)$pizza['ilosc'] . "x " . htmlspecialchars($pizza['nazwa']) . "</li>";
+        }
+        echo "</ul>";
+        echo "</div>";
+    }
+} else {
+    echo "<p>Brak zakończonych zamówień.</p>";
+}
+
+
+          ?>
+        </div>
         <div class="">
           
           <h3>szczegóły zamówień</h3>
           <?php
-          // Pobranie ID zamówienia z parametru GET
-          $zamowienieID = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-          if ($zamowienieID > 0) {
-          // Pobranie szczegółów zamówienia
-          $query = "SELECT Z.ZamowienieID, Z.UzytkownikID, Z.KwotaCalkowita, Z.Status, Z.DataUtworzenia, U.NazwaUzytkownika 
-          FROM Zamowienia Z
-           JOIN Uzytkownicy U ON Z.UzytkownikID = U.UzytkownikID WHERE Z.ZamowienieID = ?";
-    
-          $stmt = $conn->prepare($query);
-          $stmt->bind_param("i", $zamowienieID);
-          $stmt->execute();
-          $result = $stmt->get_result();
-    
-          if ($result->num_rows > 0) {
-          $order = $result->fetch_assoc();
-          echo "<h2>Szczegóły zamówienia #" . $order['ZamowienieID'] . "</h2>";
-          echo "<p>Użytkownik: " . $order['NazwaUzytkownika'] . " (ID: " . $order['UzytkownikID'] . ")</p>";
-          echo "<p>Kwota całkowita: " . number_format($order['KwotaCalkowita'], 2) . " PLN</p>";
-          echo "<p>Status: " . $order['Status'] . "</p>";
-          echo "<p>Data utworzenia: " . $order['DataUtworzenia'] . "</p>";
-          } else {
-          echo "<p>Nie znaleziono zamówienia.</p>";
+          // Sprawdzenie czy podano ID zamówienia
+//if (!isset($_GET['zamowienie_id'])) {
+//  die("Nie podano ID zamówienia.");
+//}
+
+$zamowienie_id = 1;
+
+// Pobranie danych zamówienia
+$query = "SELECT Z.ZamowienieID, U.NazwaUzytkownika, 
+               A.Ulica, A.NumerDomu, A.NumerMieszkania, A.Miasto, A.KodPocztowy,
+               Z.KwotaCalkowita, Z.Status, 
+               P.Nazwa, SZ.Ilosc
+        FROM Zamowienia Z
+        JOIN Uzytkownicy U ON Z.UzytkownikID = U.UzytkownikID
+        JOIN adresyuzytkownikow A ON U.UzytkownikID = A.UzytkownikID
+        JOIN SzczegolyZamowienia SZ ON Z.ZamowienieID = SZ.ZamowienieID
+        JOIN pizze P ON SZ.PizzaID = P.PizzaID
+        WHERE Z.ZamowienieID = $zamowienie_id";
+
+$result = $baza->query($query);
+
+if ($result && $result->num_rows > 0) {
+  $zamowienie = [];
+  while ($row = $result->fetch_assoc()) {
+      if (empty($zamowienie)) {
+          // Dane użytkownika i zamówienia
+          $adres = $row['Ulica'] . ' ' . $row['NumerDomu'];
+          if (!empty($row['NumerMieszkania'])) {
+              $adres .= '/' . $row['NumerMieszkania'];
           }
-    
-          $stmt->close();
+          $adres .= ', ' . $row['KodPocztowy'] . ' ' . $row['Miasto'];
+
+          $zamowienie = [
+              'uzytkownik' => $row['NazwaUzytkownika'],
+              'adres' => $adres,
+              'kwota' => $row['KwotaCalkowita'],
+              'status' => $row['Status'],
+              'pizze' => []
+          ];
+      }
+      $zamowienie['pizze'][] = [
+          'nazwa' => $row['Nazwa'],
+          'ilosc' => $row['Ilosc']
+      ];
+  }
+
+           // Wyświetlanie
+         echo "<h2>Szczegóły zamówienia #$zamowienie_id</h2>";
+         echo "<strong>Użytkownik:</strong> " . htmlspecialchars($zamowienie['uzytkownik']) . "<br>";
+         echo "<strong>Adres dostawy:</strong> " . htmlspecialchars($zamowienie['adres']) . "<br>";
+          echo "<strong>Status:</strong> " . htmlspecialchars($zamowienie['status']) . "<br>";
+           echo "<strong>Kwota całkowita:</strong> " . number_format($zamowienie['kwota'], 2) . " PLN<br>";
+
+          echo "<h3>Produkty:</h3><ul>";
+           foreach ($zamowienie['pizze'] as $pizza) {
+             echo "<li>" . htmlspecialchars($pizza['ilosc']) . "x " . htmlspecialchars($pizza['nazwa']) . "</li>";
+            }
+          echo "</ul>";
           } else {
-          echo "<p>Nie podano prawidłowego ID zamówienia.</p>";
+          echo "Nie znaleziono zamówienia.";
           }
+
+
           ?>
         </div>
         <div class="">

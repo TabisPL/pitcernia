@@ -1,3 +1,5 @@
+!!!Nigdy więcej nie brać Wojtka do grupy!!!
+
 ### Dodawanie ikonki ###
 
 W sekcji <header> trzeba dopisać:
