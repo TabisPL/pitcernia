@@ -20,3 +20,8 @@ $serwer = 'localhost';
 $baza_danych = 'srv82461_pizza3test';
 $uzytkownik = 'srv82461_pizza3test';
 $haslo = '12345678';
+
+### Zmiany w BD ###
+ALTER TABLE uzytkownicy
+ADD COLUMN token_akt VARCHAR(255) NULL,
+ADD COLUMN token_akt_wyg DATETIME NULL;
