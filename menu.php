@@ -8,12 +8,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="navbar.css">
 </head>
-<body style="background-image: linear-gradient(to bottom right, rgb(20,20,20), rgb(40,40,40)); background-size: 1920px 1080px; color: white;">
+<body class="bg-dark bg-gradient text-white">
 <?php include 'navbar.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <?php include_once ("menu.php"); ?>
     <!-- Formularz wybory pizzy po cenie, wielkości -->
-    <div class="formularz" style="width: 100%; padding: 20px;">
+
+    <div class="accordion" id="accordionExample" style="padding: 10px; max-width: 1500px;  margin-left: auto; margin-right: auto;">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button bg-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Morgan Freeman
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+      <div class="accordion-body" style="background-color: black;">
+      <div class="formularz" style="padding: 10px; width: 100%;  margin-left: auto; margin-right: auto;">
       <form method="post" class="row gx-3 gy-2 align-items-center">  
           <div class="input-group col-auto">
             <span class="input-group-text">Cena od do</span>
@@ -31,6 +41,7 @@
           </select>
         </div> 
         <div class="container-fluid text-center overflow-hidden">
+
         <?php
         //Tworzenie formularza do wyboru składników
 
@@ -38,18 +49,31 @@
           $skladniki = $baza->query($sql_skladniki);
           $lista_skladniki_id=array();
           $lista_skladniki_id_form=array();
+          $row_items = 0;
           foreach ($skladniki as $s ){
             $skladnik = $s["NazwaSkladnika"];
             // wybrac ID skladnika zamiast nazwy
             $skladnik_id = $s["SkladnikID"];
+            
+            if ($row_items == 0){
+              echo ('<ul class="list-group list-group-horizontal ">');
+            }
+            
             echo('
-            <div class="form-check form-check-inline col-sm-3">
-              <input class="btn-check" type="checkbox" value="" id="'. $skladnik_id .'" name="'. $skladnik_id .'">
-              <label class="btn btn-primary" for="'. $skladnik_id .'">
-                '. $skladnik .'
-              </label>
-            </div>
+            <li class="list-group-item" style="text-align: left; min-width: 25%;">
+              <input class="form-check-input me-1" type="checkbox" checked value="" id="'. $skladnik_id .'" name="'. $skladnik_id .'">
+              <label class="form-check-label stretched-link" for="'.$skladnik_id.'"> '. $skladnik .'</label>
+            </li>
             ');
+
+            if ($row_items == 3){
+              echo ('</ul>');
+            }
+            $row_items = $row_items + 1;
+            if ($row_items == 4){
+              $row_items = 0;
+              
+            }
             $lista_skladniki_id_form[] = $skladnik_id;
           }
         ?>
@@ -60,10 +84,13 @@
         </div>
       </form>
     </div>
+      </div>
+    </div>
+  </div>
 
 <!-- Wyświetlanie pizzy  -->
 
-      <div class="row row-cols-1 row-cols-md-3 g-4" style="padding: 20px; width: 1500px;  margin-left: auto; margin-right: auto;">
+      <div class="row">
       <?php 
 
         if (isset($_POST['cena_min'])){
@@ -89,7 +116,6 @@
         }
 
         //SQL na składniki 
-
         $sql = 'SELECT * FROM Pizze JOIN PizzaSkladniki ON Pizze.PizzaID=PizzaSkladniki.PizzaID JOIN Skladniki ON Skladniki.SkladnikID=PizzaSkladniki.SkladnikID 
         WHERE Cena BETWEEN '.$cena_min.' AND '.$cena_max.' AND rozmiar LIKE "'. $rozmiar.'" AND Skladniki.SkladnikID = "" ';
 
@@ -115,6 +141,8 @@
           $g3 = rand(0,255);
           $b3 = rand(0,255);
 
+          // $pizzaID [] = $p["PizzaID"];
+
           $nazwa = $p["Nazwa"];
           $image = $p["ObrazekURL"];
           $opis = $p["Opis"];
@@ -129,7 +157,7 @@
             $pizzaID [] = $p["PizzaID"];
             
             echo '
-            <div class="col">
+            <div class="col-lg-3 me-auto"   style="padding: 10px">
               <div class="card h-100 sm-shadow ">
                 <div class="card-body" style="background-color: rgb('.$r.','.$g.','.$b.')">
                   <img class="card-img-top" src="'. $image .'" alt="image">
