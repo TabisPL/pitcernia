@@ -1,15 +1,15 @@
 <?php
-// session_start(); // Start sesji
-// $czyzalogowany = isset($_SESSION['UzytkownikID']);
+session_start(); // Start sesji
+$czyzalogowany = isset($_SESSION['UzytkownikID']);
 
-// Dane do połączenia z bazą danych
-// $serwer = 'localhost';
-// $baza_danych = 'srv82461_pizza3test';
-// $uzytkownik = 'root';
-// $haslo = '';
+//Dane do połączenia z bazą danych
+$serwer = 'localhost';
+$baza_danych = 'pizza3test';
+$uzytkownik = 'root';
+$haslo = '';
 
-// Połączenie z bazą danych
-// $baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
+//Połączenie z bazą danych
+$baza = mysqli_connect($serwer, $uzytkownik, $haslo, $baza_danych);
 ?>
 
 
@@ -23,7 +23,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="navbar.css">
 </head>
-<body style=" color: white;">
+<body style="background-image: linear-gradient(to bottom right, rgb(20,20,20), rgb(40,40,40)); background-size: 1920px 1080px; color: white;">
 <?php include 'navbar.php'; ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <?php include_once ("menu.php"); ?>
