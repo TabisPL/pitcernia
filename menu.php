@@ -1,8 +1,13 @@
 <?php
+// $serwer = 'localhost';
+// $baza_danych = 'srv82461_pizza3test';
+// $uzytkownik = 'srv82461_pizza3test';
+// $haslo = '12345678';
+
 $serwer = 'localhost';
 $baza_danych = 'srv82461_pizza3test';
-$uzytkownik = 'srv82461_pizza3test';
-$haslo = '12345678';
+$uzytkownik = 'root';
+$haslo = '';
 
 $baza = new mysqli($serwer, $uzytkownik, $haslo, $baza_danych);
 ?>
@@ -32,7 +37,7 @@ $baza = new mysqli($serwer, $uzytkownik, $haslo, $baza_danych);
     <div id="collapseOne" class="accordion-collapse collapse show" >
       <div class="accordion-body " style="background-color: dimgray;">
       <div class="formularz" style="padding: 10px; width: 100%;  margin-left: auto; margin-right: auto;">
-      <form method="post" class="row gx-3 gy-2 align-items-center">
+      <form method="post" class="row gx-3 gy-2 align-items-center" name="filtr">
           <div class="input-group col-auto">
             <span class="input-group-text ">Cena od do</span>
             <input type="number" aria-label="cena_min" class="form-control" name="cena_min" id="cena_min" value="0">
@@ -107,12 +112,12 @@ $baza = new mysqli($serwer, $uzytkownik, $haslo, $baza_danych);
         if (isset($_POST['cena_max'])){
           $cena_max = $_POST['cena_max'];
         } else {
-          $cena_max = 110;
+          $cena_max = 100;
         }
         if (isset($_POST['rozmiar'])){
           $rozmiar = $_POST['rozmiar'];
         } else {
-          $rozmiar = "%";
+          $rozmiar = '%';
         }
 
         foreach ($lista_skladniki_id_form as $sf_id) {
@@ -121,31 +126,19 @@ $baza = new mysqli($serwer, $uzytkownik, $haslo, $baza_danych);
           }
         }
 
-//        $sql = "SELECT DISTINCT Pizze.*
-//         FROM Pizze
-//         LEFT JOIN PizzaSkladniki ON Pizze.PizzaID = PizzaSkladniki.PizzaID
-//         WHERE Pizze.Cena BETWEEN $cena_min AND $cena_max
-//         AND Pizze.Rozmiar LIKE '$rozmiar'";
-//
-//         // Jeśli wybrane są składniki
-//         if (!empty($wybrane_skladniki)) {
-//             $ids = implode(',', $wybrane_skladniki);
-//             $sql .= " AND Pizze.PizzaID IN (
-//                 SELECT PizzaID FROM PizzaSkladniki
-//                 WHERE SkladnikID IN ($ids)
-//                 GROUP BY PizzaID
-//             )";
-// }
-
         $sql = 'SELECT * FROM Pizze JOIN PizzaSkladniki ON Pizze.PizzaID=PizzaSkladniki.PizzaID JOIN Skladniki ON Skladniki.SkladnikID=PizzaSkladniki.SkladnikID
-        WHERE Cena BETWEEN '.$cena_min.' AND '.$cena_max.' AND rozmiar LIKE "'. $rozmiar.'" AND Skladniki.SkladnikID = "" ';
-
-        foreach ($lista_skladniki_id as $s_id) {
-          $sql = $sql.' OR Skladniki.SkladnikID = '.$s_id;
+        WHERE Cena BETWEEN '.$cena_min.' AND '.$cena_max.' AND Rozmiar LIKE "'. $rozmiar.'" AND (Skladniki.SkladnikID = "" ';
+    
+        if (!empty($lista_skladniki_id)){
+          foreach ($lista_skladniki_id as $s_id) {
+            $sql = $sql.' OR Skladniki.SkladnikID = '.$s_id;
+          }
+        } else {
+          $sql = $sql." OR Skladniki.SkladnikID LIKE '%'";
         }
+        $sql = $sql.")";
         $result = $baza->query($sql);
         $pizzaID = [];
-
         foreach($result as $p) {
           $nazwa = $p["Nazwa"];
           $image = $p["ObrazekURL"];
@@ -190,7 +183,7 @@ $baza = new mysqli($serwer, $uzytkownik, $haslo, $baza_danych);
             echo '<div class="modal-content bg-dark text-white">';
             echo '<div class="modal-header bg-dark text-white">';
             echo '<h5 class="modal-title" id="pizzaModalLabel' . $id . '">' . $nazwa . ' - Szczegóły</h5>';
-            echo '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>';
+            echo '<button type="submit" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>';
             echo '</div>';
             echo '<div class="modal-body bg-dark text-white">';
             echo '<img class="img-fluid mb-3" src="' . $image . '" alt="Pizza Image">';
@@ -209,7 +202,7 @@ $baza = new mysqli($serwer, $uzytkownik, $haslo, $baza_danych);
                   <div class="input-group">
                   <span class="input-group-text">Ilość</span>
                   <input type="number" name="ilosc" value="1" min="1" class="form-control" style="max-width: 80px;">
-                  <button type="submit" class="btn btn-success">Dodaj do koszyka</button>
+                  <button type="button" class="btn btn-success">Dodaj do koszyka</button>
                   </div>
                   </form>';
             echo '</div>';
